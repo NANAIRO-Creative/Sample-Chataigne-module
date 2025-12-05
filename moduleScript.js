@@ -54,10 +54,31 @@ function isDropFrame() {
 }
 
 /**
+ * Convert to integer (Chataigne compatible)
+ */
+function toInt(num) {
+    if (num >= 0) {
+        return Math.floor(num) - (Math.floor(num) % 1);
+    } else {
+        return Math.ceil(num) - (Math.ceil(num) % 1);
+    }
+}
+
+/**
  * Pad a number with leading zeros
  */
 function padZero(num, length) {
-    var str = "" + Math.floor(num);
+    var n = toInt(num);
+    var str = "";
+    if (n == 0) {
+        str = "0";
+    } else {
+        while (n > 0) {
+            var digit = n % 10;
+            str = ("" + toInt(digit)) + str;
+            n = toInt(n / 10);
+        }
+    }
     while (str.length < length) {
         str = "0" + str;
     }
@@ -125,21 +146,19 @@ function secondsToTimeComponents(totalSeconds) {
 }
 
 /**
- * Called every frame by Chataigne
- */
-function update(deltaTime) {
-    // Get current time using util.getTime() which returns time in seconds
-    var currentTime = util.getTime();
-    secondsToTimeComponents(currentTime);
-    updateLTCString();
-}
-
-/**
  * Called when module parameter changes
  */
 function moduleParameterChanged(param) {
-    script.log(param.name + " changed to: " + param.get());
-    updateLTCString();
+    if (param.name == "Input Time") {
+        var inputTime = param.get();
+        secondsToTimeComponents(inputTime);
+        updateLTCString();
+    } else {
+        // Frame Rate or Use Drop Frame changed, recalculate
+        var inputTime = local.parameters.inputTime.get();
+        secondsToTimeComponents(inputTime);
+        updateLTCString();
+    }
 }
 
 /**
