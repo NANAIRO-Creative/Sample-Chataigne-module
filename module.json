@@ -1,64 +1,125 @@
 {
-  "name":"My custom module",
-  "type":"OSC",
+  "name":"LTC Time Converter",
+  "type":"Time",
   "path":"Custom",
-  
+
   "version":"1.0.0",
-  "description":"My module description",
-  "url":"https://github.com/tommag/Sample-Chataigne-module",
-  "downloadURL":"https://github.com/tommag/Sample-Chataigne-module/archive/master.zip",
+  "description":"Converts Time to LTC (Linear Timecode) string format (HH:MM:SS:FF)",
+  "url":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module",
+  "downloadURL":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module/archive/master.zip",
 
   "hasInput":true,
-  "hasOutput":true, 
+  "hasOutput":false,
 
-  "hideDefaultCommands":false,
-  
-  "defaults":
-  {	
-    "autoAdd":false,
-    "oscInput":
-    {
-      "localPort":9001
-    }
-  },
+  "hideDefaultCommands":true,
 
   "parameters":
   {
-    "Module param":
+    "Frame Rate":
     {
-      "type":"Integer"
+      "type":"Enum",
+      "options":"24fps,25fps,30fps,29.97fps (Drop Frame),60fps",
+      "default":"30fps"
+    },
+    "Use Drop Frame":
+    {
+      "type":"Boolean",
+      "default":false,
+      "description":"Use drop frame notation (;) for 29.97fps and 59.94fps"
     }
   },
 
-  "hideDefaultParameters": [ "autoAdd", "oscInput/localPort"],
-
-  "scripts": 
+  "scripts":
   [
     "moduleScript.js"
   ],
 
   "values":
   {
-    "Module value":
+    "LTC String":
     {
-      "type":"Float"
+      "type":"String",
+      "default":"00:00:00:00",
+      "description":"Current time in LTC format (HH:MM:SS:FF)"
+    },
+    "Hours":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":23
+    },
+    "Minutes":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59
+    },
+    "Seconds":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59
+    },
+    "Frames":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59
     }
   },
 
   "commands":
   {
-    
-    "Custom command":
+    "Set Time":
     {
-      "menu":"",  
-      "callback":"customCmd",
+      "menu":"",
+      "callback":"setTime",
       "parameters":
       {
-        "Value":
+        "Hours":
         {
           "type":"Integer",
           "min":0,
-          "max":100,
+          "max":23,
+          "default":0
+        },
+        "Minutes":
+        {
+          "type":"Integer",
+          "min":0,
+          "max":59,
+          "default":0
+        },
+        "Seconds":
+        {
+          "type":"Integer",
+          "min":0,
+          "max":59,
+          "default":0
+        },
+        "Frames":
+        {
+          "type":"Integer",
+          "min":0,
+          "max":59,
+          "default":0
+        }
+      }
+    },
+    "Set Time From Seconds":
+    {
+      "menu":"",
+      "callback":"setTimeFromSeconds",
+      "parameters":
+      {
+        "Total Seconds":
+        {
+          "type":"Float",
+          "min":0,
           "default":0
         }
       }
