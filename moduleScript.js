@@ -57,7 +57,7 @@ function isDropFrame() {
  * Pad a number with leading zeros
  */
 function padZero(num, length) {
-    var str = Math.floor(num).toString();
+    var str = "" + Math.floor(num);
     while (str.length < length) {
         str = "0" + str;
     }
@@ -125,16 +125,13 @@ function secondsToTimeComponents(totalSeconds) {
 }
 
 /**
- * Called when the module's time value changes (from Chataigne sequence/time)
+ * Called every frame by Chataigne
  */
 function update(deltaTime) {
-    // This function is called every frame by Chataigne
-    // Get the current time from the Time module
-    var currentTime = local.getTime();
-    if (currentTime != undefined && currentTime != null) {
-        secondsToTimeComponents(currentTime);
-        updateLTCString();
-    }
+    // Get current time using util.getTime() which returns time in seconds
+    var currentTime = util.getTime();
+    secondsToTimeComponents(currentTime);
+    updateLTCString();
 }
 
 /**
