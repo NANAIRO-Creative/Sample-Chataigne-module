@@ -19,19 +19,18 @@ function init() {
  */
 function getFrameRate() {
     var frameRateParam = local.parameters.frameRate.get();
-    switch(frameRateParam) {
-        case "24fps":
-            return 24;
-        case "25fps":
-            return 25;
-        case "30fps":
-            return 30;
-        case "29.97fps (Drop Frame)":
-            return 29.97;
-        case "60fps":
-            return 60;
-        default:
-            return 30;
+    if (frameRateParam == "24fps") {
+        return 24;
+    } else if (frameRateParam == "25fps") {
+        return 25;
+    } else if (frameRateParam == "30fps") {
+        return 30;
+    } else if (frameRateParam == "29.97fps (Drop Frame)") {
+        return 29.97;
+    } else if (frameRateParam == "60fps") {
+        return 60;
+    } else {
+        return 30;
     }
 }
 
@@ -40,8 +39,8 @@ function getFrameRate() {
  */
 function getMaxFrames() {
     var fps = getFrameRate();
-    if (fps === 29.97) return 30;
-    if (fps === 60) return 60;
+    if (fps == 29.97) return 30;
+    if (fps == 60) return 60;
     return Math.floor(fps);
 }
 
@@ -51,7 +50,7 @@ function getMaxFrames() {
 function isDropFrame() {
     var frameRateParam = local.parameters.frameRate.get();
     var useDropFrame = local.parameters.useDropFrame.get();
-    return useDropFrame && (frameRateParam === "29.97fps (Drop Frame)");
+    return useDropFrame && (frameRateParam == "29.97fps (Drop Frame)");
 }
 
 /**
@@ -132,7 +131,7 @@ function update(deltaTime) {
     // This function is called every frame by Chataigne
     // Get the current time from the Time module
     var currentTime = local.getTime();
-    if (currentTime !== undefined && currentTime !== null) {
+    if (currentTime != undefined && currentTime != null) {
         secondsToTimeComponents(currentTime);
         updateLTCString();
     }
