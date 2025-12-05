@@ -25,7 +25,7 @@ function getFrameRate() {
         return 25;
     } else if (frameRateParam == "30fps") {
         return 30;
-    } else if (frameRateParam == "29.97fps (Drop Frame)") {
+    } else if (frameRateParam == "29.97fps") {
         return 29.97;
     } else if (frameRateParam == "60fps") {
         return 60;
@@ -50,7 +50,7 @@ function getMaxFrames() {
 function isDropFrame() {
     var frameRateParam = local.parameters.frameRate.get();
     var useDropFrame = local.parameters.useDropFrame.get();
-    return useDropFrame && (frameRateParam == "29.97fps (Drop Frame)");
+    return useDropFrame && (frameRateParam == "29.97fps");
 }
 
 /**

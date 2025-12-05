@@ -25,7 +25,13 @@
     "Frame Rate":
     {
       "type":"Enum",
-      "options":"24fps,25fps,30fps,29.97fps (Drop Frame),60fps",
+      "options":{
+        "24 fps": "24fps",
+        "25 fps": "25fps",
+        "30 fps": "30fps",
+        "29.97 fps DF": "29.97fps",
+        "60 fps": "60fps"
+      },
       "default":"30fps"
     },
     "Use Drop Frame":
