@@ -54,31 +54,26 @@ function isDropFrame() {
 }
 
 /**
- * Convert to integer (Chataigne compatible)
+ * Remove decimal part from string
  */
-function toInt(num) {
-    if (num >= 0) {
-        return Math.floor(num) - (Math.floor(num) % 1);
-    } else {
-        return Math.ceil(num) - (Math.ceil(num) % 1);
+function removeDecimal(str) {
+    var result = "";
+    for (var i = 0; i < str.length; i++) {
+        var c = str.charAt(i);
+        if (c == ".") {
+            break;
+        }
+        result = result + c;
     }
+    return result;
 }
 
 /**
  * Pad a number with leading zeros
  */
 function padZero(num, length) {
-    var n = toInt(num);
-    var str = "";
-    if (n == 0) {
-        str = "0";
-    } else {
-        while (n > 0) {
-            var digit = n % 10;
-            str = ("" + toInt(digit)) + str;
-            n = toInt(n / 10);
-        }
-    }
+    var str = "" + Math.floor(num);
+    str = removeDecimal(str);
     while (str.length < length) {
         str = "0" + str;
     }
