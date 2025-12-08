@@ -96,12 +96,6 @@ function updateLTCString() {
     local.values.minutes.set(currentMinutes);
     local.values.seconds.set(currentSeconds);
     local.values.frames.set(currentFrames);
-
-    // Sync input parameters with current timecode
-    local.parameters.inputHours.set(currentHours);
-    local.parameters.inputMinutes.set(currentMinutes);
-    local.parameters.inputSeconds.set(currentSeconds);
-    local.parameters.inputFrames.set(currentFrames);
 }
 
 /**
