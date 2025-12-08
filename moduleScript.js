@@ -12,6 +12,7 @@ var currentFrames = 0;
 function init() {
     script.log("LTC Time Converter module initialized");
     updateLTCString();
+    updateTotalSeconds();
 }
 
 /**
@@ -95,6 +96,26 @@ function updateLTCString() {
     local.values.minutes.set(currentMinutes);
     local.values.seconds.set(currentSeconds);
     local.values.frames.set(currentFrames);
+
+    // Sync input parameters with current timecode
+    local.parameters.inputHours.set(currentHours);
+    local.parameters.inputMinutes.set(currentMinutes);
+    local.parameters.inputSeconds.set(currentSeconds);
+    local.parameters.inputFrames.set(currentFrames);
+}
+
+/**
+ * Convert LTC input to total seconds (reverse conversion)
+ */
+function updateTotalSeconds() {
+    var fps = getFrameRate();
+    var h = local.parameters.inputHours.get();
+    var m = local.parameters.inputMinutes.get();
+    var s = local.parameters.inputSeconds.get();
+    var f = local.parameters.inputFrames.get();
+
+    var totalSeconds = h * 3600 + m * 60 + s + f / fps;
+    local.values.totalSeconds.set(totalSeconds);
 }
 
 /**
@@ -144,15 +165,23 @@ function secondsToTimeComponents(totalSeconds) {
  * Called when module parameter changes
  */
 function moduleParameterChanged(param) {
-    if (param.name == "Input Time") {
+    var paramName = param.name;
+
+    if (paramName == "Input Time") {
+        // Forward conversion: seconds to LTC
         var inputTime = param.get();
         secondsToTimeComponents(inputTime);
         updateLTCString();
-    } else {
-        // Frame Rate or Use Drop Frame changed, recalculate
+        updateTotalSeconds();
+    } else if (paramName == "Input Hours" || paramName == "Input Minutes" || paramName == "Input Seconds" || paramName == "Input Frames") {
+        // Reverse conversion: LTC to seconds
+        updateTotalSeconds();
+    } else if (paramName == "Frame Rate" || paramName == "Use Drop Frame") {
+        // Frame Rate or Use Drop Frame changed, recalculate both
         var inputTime = local.parameters.inputTime.get();
         secondsToTimeComponents(inputTime);
         updateLTCString();
+        updateTotalSeconds();
     }
 }
 

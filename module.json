@@ -39,6 +39,38 @@
       "type":"Boolean",
       "default":false,
       "description":"Use drop frame notation (;) for 29.97fps and 59.94fps"
+    },
+    "Input Hours":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":23,
+      "description":"LTC Hours input for reverse conversion"
+    },
+    "Input Minutes":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59,
+      "description":"LTC Minutes input for reverse conversion"
+    },
+    "Input Seconds":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59,
+      "description":"LTC Seconds input for reverse conversion"
+    },
+    "Input Frames":
+    {
+      "type":"Integer",
+      "default":0,
+      "min":0,
+      "max":59,
+      "description":"LTC Frames input for reverse conversion"
     }
   },
 
@@ -82,6 +114,12 @@
       "default":0,
       "min":0,
       "max":59
+    },
+    "Total Seconds":
+    {
+      "type":"Float",
+      "default":0,
+      "description":"Converted time in seconds from LTC input"
     }
   },
 
