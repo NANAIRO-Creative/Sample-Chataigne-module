@@ -1,200 +1,114 @@
-/**
- * LTC Time Converter Module for Chataigne
- * Converts Time to LTC (Linear Timecode) string format (HH:MM:SS:FF)
- */
+// Timecode Converter Module Script
+// Converts between float seconds and HH:MM:SS:FF timecode format
 
-// Current time components
-var currentHours = 0;
-var currentMinutes = 0;
-var currentSeconds = 0;
-var currentFrames = 0;
+var frameRate = 30.0;
 
 function init() {
-    script.log("LTC Time Converter module initialized");
-    updateLTCString();
+    script.log("Timecode Converter module initialized");
 }
 
-/**
- * Get the frame rate value from the parameter
- */
-function getFrameRate() {
-    var frameRateParam = local.parameters.frameRate.get();
-    if (frameRateParam == "24fps") {
-        return 24;
-    } else if (frameRateParam == "25fps") {
-        return 25;
-    } else if (frameRateParam == "30fps") {
-        return 30;
-    } else if (frameRateParam == "29.97fps") {
-        return 29.97;
-    } else if (frameRateParam == "60fps") {
-        return 60;
+// Helper function to convert float to integer (truncate decimal part)
+function toInt(num) {
+    if (num >= 0) {
+        return num - (num % 1);
     } else {
-        return 30;
+        return num + (-num % 1);
     }
 }
 
-/**
- * Get the max frames based on frame rate
- */
-function getMaxFrames() {
-    var fps = getFrameRate();
-    if (fps == 29.97) return 30;
-    if (fps == 60) return 60;
-    return Math.floor(fps);
-}
+// Called when any module parameter changes
+function moduleParameterChanged(param) {
+    script.log("Parameter changed: " + param.name);
 
-/**
- * Check if drop frame mode should be used
- */
-function isDropFrame() {
-    var frameRateParam = local.parameters.frameRate.get();
-    var useDropFrame = local.parameters.useDropFrame.get();
-    return useDropFrame && (frameRateParam == "29.97fps");
-}
-
-/**
- * Remove decimal part from string
- */
-function removeDecimal(str) {
-    var result = "";
-    for (var i = 0; i < str.length; i++) {
-        var c = str.charAt(i);
-        if (c == ".") {
-            break;
-        }
-        result = result + c;
+    if (param.name == "frameRate") {
+        frameRate = param.get();
     }
-    return result;
+    else if (param.name == "inputTimecode") {
+        var timecodeStr = param.get();
+        var seconds = timecodeToSeconds(timecodeStr);
+        local.values.outputSeconds.set(seconds);
+        script.log("Timecode to Seconds: " + timecodeStr + " -> " + seconds);
+    }
 }
 
-/**
- * Pad a number with leading zeros
- */
+// Command callback: Set seconds and convert to timecode
+function setSeconds(seconds) {
+    script.log("setSeconds command called with: " + seconds);
+    var timecode = secondsToTimecode(seconds);
+    local.values.outputTimecode.set(timecode);
+    script.log("Seconds to Timecode: " + seconds + " -> " + timecode);
+}
+
+// Command callback: Set timecode and convert to seconds
+function setTimecode(timecode) {
+    script.log("setTimecode command called with: " + timecode);
+    var seconds = timecodeToSeconds(timecode);
+    local.values.outputSeconds.set(seconds);
+    script.log("Timecode to Seconds: " + timecode + " -> " + seconds);
+}
+
+// Convert float seconds to HH:MM:SS:FF timecode
+function secondsToTimecode(totalSeconds) {
+    if (totalSeconds < 0) totalSeconds = 0;
+
+    // Calculate hours, minutes, seconds
+    var totalSecondsInt = toInt(totalSeconds);
+    var hours = toInt(totalSecondsInt / 3600);
+    var remainder = totalSecondsInt - (hours * 3600);
+    var minutes = toInt(remainder / 60);
+    var seconds = toInt(remainder - (minutes * 60));
+
+    // Calculate frames from the fractional part
+    var fractionalSeconds = totalSeconds - totalSecondsInt;
+    var frames = toInt(fractionalSeconds * frameRate);
+
+    // Ensure frames don't exceed frameRate - 1
+    var maxFrames = toInt(frameRate) - 1;
+    if (frames > maxFrames) {
+        frames = maxFrames;
+    }
+
+    // Format as HH:MM:SS:FF
+    var timecode = padZero(hours, 2) + ":" +
+                   padZero(minutes, 2) + ":" +
+                   padZero(seconds, 2) + ":" +
+                   padZero(frames, 2);
+
+    return timecode;
+}
+
+// Convert HH:MM:SS:FF timecode to float seconds
+function timecodeToSeconds(timecodeStr) {
+    // Parse the timecode string
+    var parts = timecodeStr.split(":");
+
+    if (parts.length != 4) {
+        script.logWarning("Invalid timecode format. Expected HH:MM:SS:FF, got: " + timecodeStr);
+        return 0.0;
+    }
+
+    // Use parseFloat to convert string to number
+    var hours = parseFloat(parts[0]);
+    var minutes = parseFloat(parts[1]);
+    var seconds = parseFloat(parts[2]);
+    var frames = parseFloat(parts[3]);
+
+    // Calculate total seconds
+    var totalSeconds = hours * 3600 + minutes * 60 + seconds + (frames / frameRate);
+
+    return totalSeconds;
+}
+
+// Helper function to pad numbers with leading zeros
 function padZero(num, length) {
-    var str = "" + Math.floor(num);
-    str = removeDecimal(str);
+    var str = "" + num;
+    // Remove decimal part from string (e.g., "6.0" -> "6")
+    var dotIndex = str.indexOf(".");
+    if (dotIndex >= 0) {
+        str = str.substring(0, dotIndex);
+    }
     while (str.length < length) {
         str = "0" + str;
     }
     return str;
-}
-
-/**
- * Update the LTC string value based on current time components
- */
-function updateLTCString() {
-    var separator = isDropFrame() ? ";" : ":";
-    var ltcString = padZero(currentHours, 2) + ":" +
-                    padZero(currentMinutes, 2) + ":" +
-                    padZero(currentSeconds, 2) + separator +
-                    padZero(currentFrames, 2);
-
-    local.values.ltcString.set(ltcString);
-    local.values.hours.set(currentHours);
-    local.values.minutes.set(currentMinutes);
-    local.values.seconds.set(currentSeconds);
-    local.values.frames.set(currentFrames);
-}
-
-/**
- * Convert total seconds to time components
- */
-function secondsToTimeComponents(totalSeconds) {
-    var fps = getFrameRate();
-    var maxFrames = getMaxFrames();
-
-    // Calculate total frames
-    var totalFrames = Math.floor(totalSeconds * fps);
-
-    // Handle drop frame if enabled
-    if (isDropFrame()) {
-        // Drop frame compensation for 29.97fps
-        // Skip frame numbers 0 and 1 at the start of each minute, except every 10th minute
-        var dropFrames = 2;
-        var framesPerMin = Math.round(fps * 60);
-        var framesPer10Min = Math.round(fps * 60 * 10);
-
-        var d = Math.floor(totalFrames / framesPer10Min);
-        var m = totalFrames % framesPer10Min;
-
-        if (m > dropFrames) {
-            totalFrames = totalFrames + dropFrames * 9 * d + dropFrames * Math.floor((m - dropFrames) / (framesPerMin - dropFrames));
-        } else {
-            totalFrames = totalFrames + dropFrames * 9 * d;
-        }
-    }
-
-    // Calculate time components
-    var framesPerSecond = maxFrames;
-    var framesPerMinute = framesPerSecond * 60;
-    var framesPerHour = framesPerMinute * 60;
-
-    currentHours = Math.floor(totalFrames / framesPerHour) % 24;
-    totalFrames = totalFrames % framesPerHour;
-
-    currentMinutes = Math.floor(totalFrames / framesPerMinute);
-    totalFrames = totalFrames % framesPerMinute;
-
-    currentSeconds = Math.floor(totalFrames / framesPerSecond);
-    currentFrames = totalFrames % framesPerSecond;
-}
-
-/**
- * Called when module parameter changes
- */
-function moduleParameterChanged(param) {
-    if (param.name == "Input Time") {
-        var inputTime = param.get();
-        secondsToTimeComponents(inputTime);
-        updateLTCString();
-    } else {
-        // Frame Rate or Use Drop Frame changed, recalculate
-        var inputTime = local.parameters.inputTime.get();
-        secondsToTimeComponents(inputTime);
-        updateLTCString();
-    }
-}
-
-/**
- * Command: Set time directly with HH:MM:SS:FF
- */
-function setTime(hours, minutes, seconds, frames) {
-    var maxFrames = getMaxFrames();
-
-    currentHours = Math.max(0, Math.min(23, hours));
-    currentMinutes = Math.max(0, Math.min(59, minutes));
-    currentSeconds = Math.max(0, Math.min(59, seconds));
-    currentFrames = Math.max(0, Math.min(maxFrames - 1, frames));
-
-    updateLTCString();
-    script.log("Time set to: " + local.values.ltcString.get());
-}
-
-/**
- * Command: Set time from total seconds
- */
-function setTimeFromSeconds(totalSeconds) {
-    secondsToTimeComponents(totalSeconds);
-    updateLTCString();
-    script.log("Time set from " + totalSeconds + " seconds to: " + local.values.ltcString.get());
-}
-
-/**
- * Convert current LTC time to total seconds
- */
-function ltcToSeconds() {
-    var fps = getFrameRate();
-    var totalSeconds = currentHours * 3600 +
-                       currentMinutes * 60 +
-                       currentSeconds +
-                       currentFrames / fps;
-    return totalSeconds;
-}
-
-/**
- * Get current LTC string
- */
-function getLTCString() {
-    return local.values.ltcString.get();
 }

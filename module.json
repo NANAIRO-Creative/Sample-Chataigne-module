@@ -1,139 +1,68 @@
 {
-  "name":"LTC Time Converter",
-  "type":"Time",
-  "path":"Custom",
+  "name": "LTC Time Converter",
+  "type": "Time",
+  "path": "Custom",
 
-  "version":"1.0.0",
-  "description":"Converts Time to LTC (Linear Timecode) string format (HH:MM:SS:FF)",
+  "version": "1.0.0",
+  "description": "Convert between float seconds and HH:MM:SS:FF timecode format",
   "url":"https://github.com/NANAIRO-Creative/LTC-Time-Converter-module",
   "downloadURL":"https://github.com/NANAIRO-Creative/LTC-Time-Converter-module/archive/master.zip",
 
-  "hasInput":true,
-  "hasOutput":false,
+  "hasInput": false,
+  "hasOutput": false,
 
-  "hideDefaultCommands":true,
+  "hideDefaultCommands": true,
 
-  "parameters":
-  {
-    "Input Time":
-    {
-      "type":"Float",
-      "default":0,
-      "min":0,
-      "description":"Input time in seconds (connect from other modules)"
+  "parameters": {
+    "frameRate": {
+      "type": "Float",
+      "default": 30.0,
+      "min": 1.0,
+      "max": 120.0,
+      "description": "Frame rate for timecode conversion"
     },
-    "Frame Rate":
-    {
-      "type":"Enum",
-      "options":{
-        "24 fps": "24fps",
-        "25 fps": "25fps",
-        "30 fps": "30fps",
-        "29.97 fps DF": "29.97fps",
-        "60 fps": "60fps"
-      },
-      "default":"30fps"
-    },
-    "Use Drop Frame":
-    {
-      "type":"Boolean",
-      "default":false,
-      "description":"Use drop frame notation (;) for 29.97fps and 59.94fps"
+    "inputTimecode": {
+      "type": "String",
+      "default": "00:00:00:00",
+      "description": "Input timecode HH:MM:SS:FF (manual entry)"
     }
   },
 
-  "scripts":
-  [
+  "scripts": [
     "moduleScript.js"
   ],
 
-  "values":
-  {
-    "LTC String":
-    {
-      "type":"String",
-      "default":"00:00:00:00",
-      "description":"Current time in LTC format (HH:MM:SS:FF)"
+  "values": {
+    "outputTimecode": {
+      "type": "String",
+      "description": "Converted timecode from seconds"
     },
-    "Hours":
-    {
-      "type":"Integer",
-      "default":0,
-      "min":0,
-      "max":23
-    },
-    "Minutes":
-    {
-      "type":"Integer",
-      "default":0,
-      "min":0,
-      "max":59
-    },
-    "Seconds":
-    {
-      "type":"Integer",
-      "default":0,
-      "min":0,
-      "max":59
-    },
-    "Frames":
-    {
-      "type":"Integer",
-      "default":0,
-      "min":0,
-      "max":59
+    "outputSeconds": {
+      "type": "Float",
+      "description": "Converted seconds from timecode"
     }
   },
 
-  "commands":
-  {
-    "Set Time":
-    {
-      "menu":"",
-      "callback":"setTime",
-      "parameters":
-      {
-        "Hours":
-        {
-          "type":"Integer",
-          "min":0,
-          "max":23,
-          "default":0
-        },
-        "Minutes":
-        {
-          "type":"Integer",
-          "min":0,
-          "max":59,
-          "default":0
-        },
-        "Seconds":
-        {
-          "type":"Integer",
-          "min":0,
-          "max":59,
-          "default":0
-        },
-        "Frames":
-        {
-          "type":"Integer",
-          "min":0,
-          "max":59,
-          "default":0
+  "commands": {
+    "Set Seconds": {
+      "menu": "",
+      "callback": "setSeconds",
+      "parameters": {
+        "seconds": {
+          "type": "Float",
+          "default": 0.0,
+          "description": "Time in seconds to convert to timecode"
         }
       }
     },
-    "Set Time From Seconds":
-    {
-      "menu":"",
-      "callback":"setTimeFromSeconds",
-      "parameters":
-      {
-        "Total Seconds":
-        {
-          "type":"Float",
-          "min":0,
-          "default":0
+    "Set Timecode": {
+      "menu": "",
+      "callback": "setTimecode",
+      "parameters": {
+        "timecode": {
+          "type": "String",
+          "default": "00:00:00:00",
+          "description": "Timecode HH:MM:SS:FF to convert to seconds"
         }
       }
     }
