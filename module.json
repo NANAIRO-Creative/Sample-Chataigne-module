@@ -5,8 +5,8 @@
 
   "version":"1.0.0",
   "description":"Converts Time to LTC (Linear Timecode) string format (HH:MM:SS:FF)",
-  "url":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module",
-  "downloadURL":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module/archive/master.zip",
+  "url":"https://github.com/NANAIRO-Creative/LTC-Time-Converter-module",
+  "downloadURL":"https://github.com/NANAIRO-Creative/LTC-Time-Converter-module/archive/master.zip",
 
   "hasInput":true,
   "hasOutput":false,
