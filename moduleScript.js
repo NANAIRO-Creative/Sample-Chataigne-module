@@ -9,10 +9,15 @@ var currentMinutes = 0;
 var currentSeconds = 0;
 var currentFrames = 0;
 
+// Input LTC components for reverse conversion
+var inputHours = 0;
+var inputMinutes = 0;
+var inputSeconds = 0;
+var inputFrames = 0;
+
 function init() {
     script.log("LTC Time Converter module initialized");
     updateLTCString();
-    updateTotalSeconds();
 }
 
 /**
@@ -103,12 +108,7 @@ function updateLTCString() {
  */
 function updateTotalSeconds() {
     var fps = getFrameRate();
-    var h = local.parameters.inputHours.get();
-    var m = local.parameters.inputMinutes.get();
-    var s = local.parameters.inputSeconds.get();
-    var f = local.parameters.inputFrames.get();
-
-    var totalSeconds = h * 3600 + m * 60 + s + f / fps;
+    var totalSeconds = inputHours * 3600 + inputMinutes * 60 + inputSeconds + inputFrames / fps;
     local.values.totalSeconds.set(totalSeconds);
 }
 
@@ -166,14 +166,20 @@ function moduleParameterChanged(param) {
         var inputTime = param.get();
         secondsToTimeComponents(inputTime);
         updateLTCString();
+    } else if (paramName == "Input Hours") {
+        inputHours = param.get();
         updateTotalSeconds();
-    } else if (paramName == "Input Hours" || paramName == "Input Minutes" || paramName == "Input Seconds" || paramName == "Input Frames") {
-        // Reverse conversion: LTC to seconds
+    } else if (paramName == "Input Minutes") {
+        inputMinutes = param.get();
+        updateTotalSeconds();
+    } else if (paramName == "Input Seconds") {
+        inputSeconds = param.get();
+        updateTotalSeconds();
+    } else if (paramName == "Input Frames") {
+        inputFrames = param.get();
         updateTotalSeconds();
     } else if (paramName == "Frame Rate" || paramName == "Use Drop Frame") {
-        // Frame Rate or Use Drop Frame changed, recalculate both
-        var inputTime = local.parameters.inputTime.get();
-        secondsToTimeComponents(inputTime);
+        // Frame Rate or Use Drop Frame changed, recalculate
         updateLTCString();
         updateTotalSeconds();
     }
