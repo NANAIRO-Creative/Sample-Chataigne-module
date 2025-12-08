@@ -1,6 +1,6 @@
 {
   "name":"LTC Time Converter",
-  "type":"Generic",
+  "type":"Time",
   "path":"Custom",
 
   "version":"1.0.0",
@@ -8,7 +8,7 @@
   "url":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module",
   "downloadURL":"https://github.com/NANAIRO-Creative/Sample-Chataigne-module/archive/master.zip",
 
-  "hasInput":false,
+  "hasInput":true,
   "hasOutput":false,
 
   "hideDefaultCommands":true,
